@@ -15,7 +15,7 @@ payload = {  # type: ignore
 }
 
 headers = {
-    "Authorization": "Bearer f76449fad5eb4aaabd5c25e1a1fdc524.hiGxkcdkTXYK0t8A",
+    "Authorization": "Bearer ",
     "Content-Type": "application/json"
 }
 
