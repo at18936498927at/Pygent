@@ -15,7 +15,7 @@ payload = {  # type: ignore
 }
 
 headers = {
-    "Authorization": "Bearer ",
+    "Authorization": "Bearer {api_key}",
     "Content-Type": "application/json"
 }
 
