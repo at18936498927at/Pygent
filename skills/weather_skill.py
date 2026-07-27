@@ -7,7 +7,7 @@ class WeatherSkill(BaseSkill):
     name = "weather"
     description = "Provides weather information for a given location."
 
-    def get_weather(self, location: str) -> str:
+    def run(self, location: str) -> str:
         """
         Fetches the weather information for the specified location.
 
