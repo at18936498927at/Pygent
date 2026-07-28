@@ -1,0 +1,3 @@
+PySide6
+duckduckgo_search
+requests<=2.34.2
