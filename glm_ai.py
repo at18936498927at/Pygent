@@ -1,36 +1,59 @@
 import requests
 import json
+from typing import Literal
+
+from session import session
+from message import HumanMessage, AIMessage
 
 
 url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 
-payload = {  # type: ignore
-    "model": "glm-4v-flash",
-    "messages": [
-        {"role": "system", "content": "You are a helpful assiantant."},
-        {"role": "user", "content": "Hello! I'm GLM 4.7 Flash."}
-    ],
-    "stream": True,
-    "temperature": 1
-}
+type GLMModels = Literal["glm-4v-flash", 
+                         "glm-4.6v-flash", 
+                         "glm-4.7-flash", 
+                         "glm-4.1-thinking-flash", 
+                         "glm-4-flash-250414", 
+                         "Cogview3-Flash", 
+                         "CodVideoX-Flash"]
 
-headers = {
-    "Authorization": "Bearer {api_key}",
-    "Content-Type": "application/json"
-}
+def stream_response(msg: str,  # type: ignore[reportUnknownParameterType]
+                    model: GLMModels="glm-4v-flash", 
+                    temperature: float=1) -> AIMessage: # type: ignore
+    session.add_msg(HumanMessage(msg=msg))
+    payload = {  # type: ignore
+        "model": model,
+        "messages": session.history, # type: ignore
+        "stream": True,
+        "temperature": temperature,
+    }
 
-response = requests.post(url, json=payload, headers=headers, stream=True, verify=True)  # type: ignore
+    key = "f76449fad5eb4aaabd5c25e1a1fdc524.hiGxkcdkTXYK0t8A"
 
-for line in response.iter_lines():
-    if line:
-        line_str = line.decode('utf-8')
-        if line_str.startswith('data: [DONE]'):
-            break
-        if line_str.startswith('data: '):
-            json_str = line_str[5:]
-            try:
-                data = json.loads(json_str)
-                content = data["choices"][0]["delta"].get("content", "")
-                print(content, end="", flush=True)  # TODO: Make it into function and not use print.
-            except Exception as e:
-                print(e)
+    headers = {
+        "Authorization": f"Bearer {key}", # TODO: Improve the key
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, 
+                             json=payload, # type: ignore
+                             headers=headers, 
+                             stream=True, 
+                             verify=True)
+
+    all_content: str = ""
+
+    for line in response.iter_lines():
+        if line:
+            line_str = line.decode('utf-8')
+            if line_str.startswith('data: [DONE]'):
+                break
+            if line_str.startswith('data: '):
+                json_str = line_str[5:]
+                try:
+                    data = json.loads(json_str)
+                    content = data["choices"][0]["delta"].get("content", "")
+                    all_content += content
+                    print(content, end="", flush=True)  # TODO: Use func.
+                except Exception as e:
+                    print(e)
+    return AIMessage(msg=all_content)
