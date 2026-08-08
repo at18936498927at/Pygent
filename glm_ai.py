@@ -1,11 +1,14 @@
-import requests
 import json
+import os
 from typing import Literal
 
+import requests
+from dotenv import load_dotenv
+
+from message import AIMessage, HumanMessage
 from session import session
-from message import HumanMessage, AIMessage
 
-
+load_dotenv()
 url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 
 type GLMModels = Literal["glm-4v-flash", 
@@ -15,6 +18,7 @@ type GLMModels = Literal["glm-4v-flash",
                          "glm-4-flash-250414", 
                          "Cogview3-Flash", 
                          "CodVideoX-Flash"]
+
 
 def stream_response(msg: str,  # type: ignore[reportUnknownParameterType]
                     model: GLMModels="glm-4v-flash", 
@@ -27,7 +31,7 @@ def stream_response(msg: str,  # type: ignore[reportUnknownParameterType]
         "temperature": temperature,
     }
 
-    key = "f76449fad5eb4aaabd5c25e1a1fdc524.hiGxkcdkTXYK0t8A"
+    key = os.getenv("GLM_API_KEY", "")
 
     headers = {
         "Authorization": f"Bearer {key}", # TODO: Improve the key
