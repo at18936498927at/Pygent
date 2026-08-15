@@ -14,7 +14,7 @@ url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 type GLMModels = Literal["glm-4v-flash", 
                          "glm-4.6v-flash", 
                          "glm-4.7-flash", 
-                         "glm-4.1-thinking-flash", 
+                         "glm-4.1v-thinking-flash", 
                          "glm-4-flash-250414", 
                          "Cogview3-Flash", 
                          "CodVideoX-Flash"]
@@ -22,6 +22,7 @@ type GLMModels = Literal["glm-4v-flash",
 
 def stream_response(msg: str,  # type: ignore[reportUnknownParameterType]
                     model: GLMModels="glm-4v-flash", 
+                    environ_name: str="GLM_API_KEY",
                     temperature: float=1) -> AIMessage: # type: ignore
     session.add_msg(HumanMessage(msg=msg))
     payload = {  # type: ignore
@@ -31,10 +32,10 @@ def stream_response(msg: str,  # type: ignore[reportUnknownParameterType]
         "temperature": temperature,
     }
 
-    key = os.getenv("GLM_API_KEY", "")
+    key = os.getenv(environ_name, "")
 
     headers = {
-        "Authorization": f"Bearer {key}", # TODO: Improve the key
+        "Authorization": f"Bearer {key}", 
         "Content-Type": "application/json"
     }
 
